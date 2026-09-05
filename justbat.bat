@@ -94,6 +94,7 @@ if "%scelta%"=="" goto menu
 if /I "%scelta%"=="XD" explorer "!XD!"
 if /I "%scelta%"=="XDdebug" explorer "!XDdebug!"
 if /I "%scelta%"=="XD" goto menu
+if /I "%scelta%"=="xdinfo" start "" "https://docs.google.com/spreadsheets/d/1rO2zTJnVQIvOnXyJDLLDBaHUqzN-_hCKgND_QGHfDSA/edit?usp=sharing" & goto menu
 
 if /I "%scelta%"=="XD1" goto super_utility_1
 if /I "%scelta%"=="XD2" goto super_utility_2
