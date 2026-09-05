@@ -1,103 +1,66 @@
 @echo off
-setlocal enabledelayedexpansion
-title Installer di JustBat
+title Installazione JustBat
+color 0b
 
 :: ==========================================
 :: 1. CONTROLLO PRIVILEGI AMMINISTRATORE
 :: ==========================================
 net session >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [!] Richiesta privilegi di Amministratore in corso...
+    echo [*] Richiesta permessi di Amministratore in corso...
     powershell -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
     exit /b
 )
 
 :: ==========================================
-:: 2. DEFINIZIONE PERCORSI SICURI
+:: 2. IMPOSTAZIONE VARIABILI E PERCORSI (LINK RAW AGGIORNATI)
 :: ==========================================
-set "TARGET_DIR=%ProgramFiles%\justbat"
-set "XD_DIR=%TARGET_DIR%\XD"
-
-:: Preparazione percorso per autodistruzione
-set "DEL_DIR=%~dp0"
-if "!DEL_DIR:~-1!"=="\" set "DEL_DIR=!DEL_DIR:~0,-1!"
+set "TARGET_DIR=C:\Program Files\justbat"
+set "BAT_URL=https://raw.githubusercontent.com/gaetron/just-bat/main/justbat.bat"
+set "ICO_URL=https://raw.githubusercontent.com/gaetron/just-bat/main/installer/image.ico"
 
 cls
 echo =================================================================
-echo                      INSTALLAZIONE JUSTBAT
+echo                 INSTALLAZIONE DI JUSTBAT (ONLINE)
 echo =================================================================
 echo.
 
 :: ==========================================
-:: 3. CREAZIONE CARTELLA PRINCIPALE
+:: 3. CREAZIONE CARTELLE
 :: ==========================================
-echo [*] Creazione cartella principale in Program Files...
+echo [*] Creazione delle cartelle di sistema...
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
+if not exist "%TARGET_DIR%\XD" mkdir "%TARGET_DIR%\XD"
+attrib +h "%TARGET_DIR%\XD"
 
 :: ==========================================
-:: 4. COPIA DEL FILE BAT
+:: 4. DOWNLOAD FILE DA GITHUB
 :: ==========================================
-echo [*] Ricerca di justbat.bat e copia in corso...
-set "copiato=0"
+echo [*] Download di justbat.bat da GitHub...
+curl -s -L -o "%TARGET_DIR%\justbat.bat" "%BAT_URL%"
 
-if exist "%~dp0justbat.bat" (
-    copy /y "%~dp0justbat.bat" "%TARGET_DIR%\justbat.bat" >nul
-    set "copiato=1"
-)
+echo [*] Download dell'icona da GitHub...
+curl -s -L -o "%TARGET_DIR%\image.ico" "%ICO_URL%"
 
-if "!copiato!"=="0" (
-    echo.
-    echo [!] ERRORE GRAVE: justbat.bat non trovato!
-    echo.
-    pause
-    exit /b
-)
+:: Nasconde l'icona dopo averla scaricata
+if exist "%TARGET_DIR%\image.ico" attrib +h "%TARGET_DIR%\image.ico"
 
 :: ==========================================
-:: 5. CREAZIONE CARTELLA NASCOSTA XD
-:: ==========================================
-echo [*] Creazione cartella nascosta XD...
-if not exist "%XD_DIR%" mkdir "%XD_DIR%"
-attrib +h "%XD_DIR%"
-
-:: ==========================================
-:: 6. CREAZIONE COLLEGAMENTO SUL DESKTOP
+:: 5. CREAZIONE COLLEGAMENTO SUL DESKTOP
 :: ==========================================
 echo [*] Creazione del collegamento sul Desktop...
-if exist "!DEL_DIR!\image.ico" (
-    copy /y "!DEL_DIR!\image.ico" "%TARGET_DIR%\image.ico" >nul
-    attrib +h "%TARGET_DIR%\image.ico"
-)
-
-powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $desktop = $wshell.SpecialFolders('Desktop'); $s = $wshell.CreateShortcut(\"$desktop\JustBat.lnk\"); $s.TargetPath = '%TARGET_DIR%\justbat.bat'; $s.WorkingDirectory = '%TARGET_DIR%'; $s.IconLocation = '%TARGET_DIR%\image.ico'; $s.Save()"
+powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $s = $wshell.CreateShortcut('%USERPROFILE%\OneDrive\Desktop\JustBat.lnk'); $s.TargetPath = '%TARGET_DIR%\justbat.bat'; $s.WorkingDirectory = '%TARGET_DIR%'; $s.IconLocation = '%TARGET_DIR%\image.ico'; $s.Save()"
 
 :: ==========================================
-:: 7. AUTODISTRUZIONE TOTALE CARTELLA (con retry)
+:: 6. CONCLUSIONE E AUTODISTRUZIONE
 :: ==========================================
-:: Generiamo uno script di pulizia separato in TEMP: ritenta piu' volte
-:: per dare tempo a Explorer/antivirus di rilasciare eventuali handle
-:: ancora aperti sulla cartella sorgente.
-set "CLEANUP=%TEMP%\jb_cleanup_%RANDOM%.bat"
-set "LEFTOVER=%TEMP%\jb_leftover_%RANDOM%"
+echo.
+echo =================================================================
+echo [OK] INSTALLAZIONE COMPLETATA CON SUCCESSO!
+echo =================================================================
+echo.
+echo [!] Chiusura e pulizia dei file temporanei...
+timeout /t 3 >nul
 
->  "!CLEANUP!" echo @echo off
->> "!CLEANUP!" echo timeout /t 3 /nobreak ^>nul
->> "!CLEANUP!" echo for /l %%%%i in (1,1,10) do (
->> "!CLEANUP!" echo   move /y "!DEL_DIR!" "!LEFTOVER!" ^>nul 2^>nul
->> "!CLEANUP!" echo   if exist "!LEFTOVER!" goto :moved
->> "!CLEANUP!" echo   timeout /t 2 /nobreak ^>nul
->> "!CLEANUP!" echo )
->> "!CLEANUP!" echo :moved
->> "!CLEANUP!" echo if exist "!LEFTOVER!" (
->> "!CLEANUP!" echo   rmdir /s /q "!LEFTOVER!" 2^>nul
->> "!CLEANUP!" echo ) else (
->> "!CLEANUP!" echo   rmdir /s /q "!DEL_DIR!" 2^>nul
->> "!CLEANUP!" echo )
->> "!CLEANUP!" echo del "%%~f0"
-
-:: Usciamo dalla cartella per sbloccarla da questo processo
-cd /d "%TEMP%"
-
-start /b "" cmd /c "!CLEANUP!"
-
-exit
+:: Autodistruzione dell'installer (si cancella da solo alla fine)
+(goto) 2>nul & del "%~f0"
