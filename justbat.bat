@@ -143,6 +143,49 @@ if %scelta%==20 goto utility_20
 goto menu
 ::#endregion
 
+::#region update
+:update
+cls
+echo [*] Ricerca aggiornamenti da GitHub in corso...
+echo.
+
+:: Link RAW esatto alla tua repository
+set "GITHUB_URL=https://raw.githubusercontent.com/gaetron/just-bat/main/justbat.bat"
+set "TEMP_FILE=%TEMP%\justbat_update.bat"
+
+:: Scarica la nuova versione in modo silenzioso
+curl -s -L -o "%TEMP_FILE%" "%GITHUB_URL%"
+
+:: Controlla se il file e' stato scaricato
+if exist "%TEMP_FILE%" (
+    :: Tenta di sovrascrivere lo script attuale
+    copy /y "%TEMP_FILE%" "%~f0" >nul
+    
+    :: Controlla se la copia e' fallita (es. mancano permessi admin)
+    if %errorlevel% neq 0 (
+        echo [!] ERRORE: Impossibile sovrascrivere il file. 
+        echo [*] Assicurati di aver avviato justbat come Amministratore!
+        del "%TEMP_FILE%" >nul
+        pause
+        goto menu
+    )
+    
+    del "%TEMP_FILE%" >nul
+    
+    echo [OK] Aggiornamento completato con successo!
+    echo [*] Riavvio di justbat in corso...
+    timeout /t 3 >nul
+    
+    :: Riavvia il programma nella nuova versione e chiude questo vecchio
+    start "" "%~f0"
+    exit
+) else (
+    echo [!] ERRORE: Impossibile scaricare l'aggiornamento. Controlla la connessione.
+    pause
+    goto menu
+)
+::#endregion
+
 ::#region utility 1
 :utility_1 :: wifi grab
 cls
