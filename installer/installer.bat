@@ -1,6 +1,6 @@
 @echo off
 title Installazione JustBat
-color 0b
+color 0a
 
 :: ==========================================
 :: 1. CONTROLLO PRIVILEGI AMMINISTRATORE
