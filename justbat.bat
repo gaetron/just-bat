@@ -14,7 +14,7 @@ if "%~1"=="spawn_chaos" (
 ::#region boot 
 setlocal enabledelayedexpansion
 chcp 65001 >nul
-mode con: cols=100 lines=30
+mode con: cols=135 lines=35
 title :D
 
 set "G=[92m"  &:: Verde Neon
@@ -24,6 +24,9 @@ set "R=[0m"   &:: Reset
 
 set "XDdebug=%~d0\justbat\XD"
 set "XD=C:\Program Files\justbat\XD"
+
+set "modmenudebug=%~d0\justbat\mod"
+set "modmenu=C:\Program Files\justbat\mod"
 
 :boot
 cls
@@ -66,22 +69,24 @@ for /l %%i in (1,1,3) do (
 :menu
 cls
 color 0a
-echo /=================================================================\
-echo \      ##### #   # ##### #######     @@@@@   @@@@@@ @@@@@@@       /
-echo /         #  #   # #        #        @    @  @    @    @          \
-echo \         #  #   #  ###     #        @@@@@   @@@@@@    @          /
-echo /         #  #   #     #    #        @    @  @    @    @          \
-echo \     ####   ##### #####    #        @@@@@   @    @    @          /
-echo /                                                                 \
-echo \=================================================================/
+
+echo /=================================================================\    ^|============================================^|
+echo \      ##### #   # ##### #######     @@@@@   @@@@@@ @@@@@@@       /    ^| @@      @@    @@@@@@    @@@@@@     @@@@@@@ ^|
+echo /         #  #   # #        #        @    @  @    @    @          \    ^| @@@@  @@@@   @@@  @@@   @@   @@   @@       ^|
+echo \         #  #   #  ###     #        @@@@@   @@@@@@    @          /    ^| @@@@  @@@@   @@    @@   @@    @@   @@@     ^|
+echo /         #  #   #     #    #        @    @  @    @    @          \    ^| @@  @@  @@   @@    @@   @@    @@      @@@  ^|
+echo \     ####   ##### #####    #        @@@@@   @    @    @          /    ^| @@      @@   @@@  @@@   @@   @@         @@ ^|
+echo /                                                                 \    ^| @@      @@    @@@@@@    @@@@@@    @@@@@@@  ^|
+echo \=================================================================/    ^|============================================^|
+echo                                                                        ^|                                            ^|
+echo   ################################################################     ^|        DOWNLOAD FROM TRUSTED SOURCE        ^|
+echo   ^|1-wifi grab    ^| 6-Convertor   ^|11-roborename   ^|16-win fix   ^|     ^|    I TAKE NO RESPONSIBILITY ON THE MODS    ^|
+echo   ^|2-deep clean   ^| 7-QR generator^|12-YT DLP       ^|17-null      ^|     ^|                                            ^|
+echo   ^|3-NeoFetch     ^| 8-Truth check ^|13-format conv  ^|18-null      ^|     ^|             _______________                ^|
+echo   ^|4-Flush DNS    ^| 9-File logger ^|14-ascii recolor^|19-download  ^|     ^|            ^|mod for modmenu^|               ^|
+echo   ^|5-Robocopy     ^|10-crypter     ^|15-ssh          ^|20-animation ^|     ^|             ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾                ^|
+echo   ################################################################     ^|============================================^|
 echo.
-echo   ################################################################
-echo   ^|1-wifi grab    ^| 6-Convertor   ^|11-roborename   ^|16-win fix   ^|
-echo   ^|2-deep clean   ^| 7-QR generator^|12-YT DLP       ^|17-null      ^|
-echo   ^|3-NeoFetch     ^| 8-Truth check ^|13-format conv  ^|18-null      ^|
-echo   ^|4-Flush DNS    ^| 9-File logger ^|14-ascii recolor^|19-download  ^|
-echo   ^|5-Robocopy     ^|10-crypter     ^|15-ssh          ^|20-animation ^|
-echo   ################################################################
 echo.
 
 set "scelta="
@@ -93,9 +98,14 @@ if "%scelta%"=="" goto menu
 
 if /I "%scelta%"=="XD" explorer "!XD!"
 if /I "%scelta%"=="XDdebug" explorer "!XDdebug!"
+
 if /I "%scelta%"=="XD" goto menu
-if /I "%scelta%"=="XDupdate" goto update
+if /I "%scelta%"=="XDdebug" goto menu
+
 if /I "%scelta%"=="xdinfo" start "" "https://docs.google.com/spreadsheets/d/1rO2zTJnVQIvOnXyJDLLDBaHUqzN-_hCKgND_QGHfDSA/edit?usp=sharing" & goto menu
+if /I "%scelta%"=="mod" goto mod
+
+if /I "%scelta%"=="XDupdate" goto update
 
 if /I "%scelta%"=="XD1" goto super_utility_1
 if /I "%scelta%"=="XD2" goto super_utility_2
@@ -187,6 +197,65 @@ if exist "%TEMP_FILE%" (
     goto menu
 )
 ::#endregion
+
+::#region mod
+:mod
+setlocal enabledelayedexpansion
+cls
+
+echo ^|=============================================^|
+echo ^| @@      @@    @@@@@@    @@@@@@     @@@@@@@  ^|
+echo ^| @@@@  @@@@   @@@  @@@   @@   @@   @@        ^|
+echo ^| @@@@  @@@@   @@    @@   @@    @@   @@@      ^|
+echo ^| @@  @@  @@   @@    @@   @@    @@      @@@   ^|
+echo ^| @@      @@   @@@  @@@   @@   @@         @@  ^|
+echo ^| @@      @@    @@@@@@    @@@@@@    @@@@@@@   ^|
+echo ^|=============================================^|
+echo ^|                                             ^|
+echo ^|        DOWNLOAD FROM TRUSTED SOURCE         ^|
+echo ^|    I TAKE NO RESPONSIBILITY ON THE MODS     ^|
+echo ^|                                             ^|
+echo ^|=============================================^|
+echo.
+
+set "modDir=%~dp0mod"
+if not exist "%modDir%" mkdir "%modDir%"
+
+set count=0
+for /f "delims=" %%f in ('dir "%modDir%" /b /a-d /o-d') do (
+    set /a count+=1
+    set "file!count!=%modDir%\%%f"
+    echo !count!^) %%f
+)
+
+if %count%==0 (
+    echo Nessun file trovato nella cartella mod.
+    pause
+    goto menu
+)
+
+echo.
+set /p scelta="Inserisci il numero del file da avviare (exit per uscire): "
+
+if "%scelta%"=="exit" goto menu
+
+if "%scelta%"=="modmenu" explorer "!modmenu!"
+if "%scelta%"=="modmenudebug" explorer "!modmenudebug!"
+
+if "%scelta%"=="modmenu" goto mod
+if "%scelta%"=="modmenudebug" goto mod
+
+if defined file%scelta% (
+    call "!file%scelta%!"
+) else (
+    echo Numero non valido.
+    pause
+)
+
+goto mod
+::#endregion
+
+
 
 ::#region utility 1
 :utility_1 :: wifi grab
