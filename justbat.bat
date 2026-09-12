@@ -230,8 +230,6 @@ for /f "delims=" %%f in ('dir "%modDir%" /b /a-d /o-d') do (
 
 if %count%==0 (
     echo Nessun file trovato nella cartella mod.
-    pause
-    goto menu
 )
 
 echo.
