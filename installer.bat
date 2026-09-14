@@ -13,11 +13,11 @@ if %errorlevel% neq 0 (
 )
 
 :: ==========================================
-:: 2. IMPOSTAZIONE VARIABILI E PERCORSI (LINK RAW AGGIORNATI)
+:: 2. IMPOSTAZIONE VARIABILI E PERCORSI
 :: ==========================================
 set "TARGET_DIR=C:\Program Files\justbat"
 set "BAT_URL=https://raw.githubusercontent.com/gaetron/just-bat/main/justbat.bat"
-set "ICO_URL=https://raw.githubusercontent.com/gaetron/just-bat/main/installer/image.ico"
+set "ICO_URL=https://raw.githubusercontent.com/gaetron/just-bat/main/justbat.ico"
 
 cls
 echo =================================================================
@@ -40,27 +40,30 @@ echo [*] Download di justbat.bat da GitHub...
 curl -s -L -o "%TARGET_DIR%\justbat.bat" "%BAT_URL%"
 
 echo [*] Download dell'icona da GitHub...
-curl -s -L -o "%TARGET_DIR%\image.ico" "%ICO_URL%"
+curl -s -L -o "%TARGET_DIR%\justbat.ico" "%ICO_URL%"
 
 :: Nasconde l'icona dopo averla scaricata
-if exist "%TARGET_DIR%\image.ico" attrib +h "%TARGET_DIR%\image.ico"
+if exist "%TARGET_DIR%\justbat.ico" attrib +h "%TARGET_DIR%\justbat.ico"
 
 :: ==========================================
 :: 5. CREAZIONE COLLEGAMENTO SUL DESKTOP
 :: ==========================================
 echo [*] Creazione del collegamento sul Desktop...
-powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $s = $wshell.CreateShortcut('%USERPROFILE%\OneDrive\Desktop\JustBat.lnk'); $s.TargetPath = '%TARGET_DIR%\justbat.bat'; $s.WorkingDirectory = '%TARGET_DIR%'; $s.IconLocation = '%TARGET_DIR%\image.ico'; $s.Save()"
+powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $s = $wshell.CreateShortcut('%USERPROFILE%\OneDrive\Desktop\JustBat.lnk'); $s.TargetPath = '%TARGET_DIR%\justbat.bat'; $s.WorkingDirectory = '%TARGET_DIR%'; $s.IconLocation = '%TARGET_DIR%\justbat.ico'; $s.Save()"
 
 :: ==========================================
-:: 6. CONCLUSIONE E AUTODISTRUZIONE
+:: 6. CONCLUSIONE E AUTODISTRUZIONE PULITA
 :: ==========================================
 echo.
 echo =================================================================
 echo [OK] INSTALLAZIONE COMPLETATA CON SUCCESSO!
 echo =================================================================
 echo.
-echo [!] Chiusura e pulizia dei file temporanei...
+echo [!] Chiusura e pulizia dei file...
 timeout /t 3 >nul
 
-:: Autodistruzione dell'installer (si cancella da solo alla fine)
+:: Forza l'aggiornamento della cache delle icone di Windows
+ie4uinit.exe -show >nul 2>&1
+
+:: Autodistruzione dell'installer e chiusura pulita
 (goto) 2>nul & del "%~f0"
