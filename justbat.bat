@@ -11,6 +11,12 @@ if "%~1"=="spawn_chaos" (
 )
 ::#endregion
 
+::#region portable
+set "portable=0"
+for /f %%A in ('powershell -NoProfile -Command "(New-Object -ComObject Scripting.FileSystemObject).GetDrive('%~d0').DriveType"') do set "drivetype=%%A"
+if "%drivetype%"=="1" set "portable=1"
+::#endregion
+
 ::#region boot 
 setlocal enabledelayedexpansion
 chcp 65001 >nul
@@ -22,11 +28,9 @@ set "B=[94m"  &:: Blu Cyber
 set "W=[97m"  &:: Bianco
 set "R=[0m"   &:: Reset
 
-set "XDdebug=%~d0\justbat\XD"
-set "XD=C:\Program Files\justbat\XD"
+if "%portable%"=="1" (set "XD=%~d0\justbat\XD") else (set "XD=C:\Program Files\justbat\XD")
 
-set "modmenudebug=%~d0\justbat\mod"
-set "modmenu=C:\Program Files\justbat\mod"
+if "%portable%"=="1" (set "modmenu=%~d0\justbat\mod") else (set "modmenu=C:\Program Files\justbat\mod")
 
 :boot
 cls
@@ -35,6 +39,8 @@ echo.
 echo %B%  NODE: %COMPUTERNAME%
 echo %B%  USER: %USERNAME%
 echo %B%  ARCH: %PROCESSOR_ARCHITECTURE%
+echo.
+if "%portable%"=="1" (echo %B%  MODE: PORTABLE) else (echo %B%  MODE: DESKTOP SUIT)
 echo.
 echo %W%Loading neural modules...%R%
 
@@ -97,60 +103,20 @@ if /I "%scelta%"=="exit" exit
 if "%scelta%"=="" goto menu
 
 if /I "%scelta%"=="XD" explorer "!XD!"
-if /I "%scelta%"=="XDdebug" explorer "!XDdebug!"
 
 if /I "%scelta%"=="XD" goto menu
-if /I "%scelta%"=="XDdebug" goto menu
 
 if /I "%scelta%"=="xdinfo" start "" "https://docs.google.com/spreadsheets/d/1rO2zTJnVQIvOnXyJDLLDBaHUqzN-_hCKgND_QGHfDSA/edit?usp=sharing" & goto menu
 if /I "%scelta%"=="mod" goto mod
 
 if /I "%scelta%"=="XDupdate" goto update
 
-if /I "%scelta%"=="XD1" goto super_utility_1
-if /I "%scelta%"=="XD2" goto super_utility_2
-if /I "%scelta%"=="XD3" goto super_utility_3
-if /I "%scelta%"=="XD4" goto super_utility_4
-if /I "%scelta%"=="XD5" goto super_utility_5
-if /I "%scelta%"=="XD6" goto super_utility_6
-if /I "%scelta%"=="XD7" goto super_utility_7
-if /I "%scelta%"=="XD8" goto super_utility_8
-if /I "%scelta%"=="XD9" goto super_utility_9
-if /I "%scelta%"=="XD10" goto super_utility_10
-if /I "%scelta%"=="XD11" goto super_utility_11
-if /I "%scelta%"=="XD12" goto super_utility_12
-if /I "%scelta%"=="XD13" goto super_utility_13
-if /I "%scelta%"=="XD14" goto super_utility_14
-if /I "%scelta%"=="XD15" goto super_utility_15
-if /I "%scelta%"=="XD16" goto super_utility_16
-if /I "%scelta%"=="XD17" goto super_utility_17
-if /I "%scelta%"=="XD18" goto super_utility_18
-if /I "%scelta%"=="XD19" goto super_utility_19
-if /I "%scelta%"=="XD20" goto super_utility_20
+if /I "%scelta:~0,2%"=="XD" (set "n=%scelta:~2%" & if !n! geq 1 if !n! leq 20 goto super_utility_!n!)
 
 echo %scelta%| findstr /r "^[0-9]*$" >nul
 if errorlevel 1 goto menu
 
-if %scelta%==1 goto utility_1
-if %scelta%==2 goto utility_2
-if %scelta%==3 goto utility_3
-if %scelta%==4 goto utility_4
-if %scelta%==5 goto utility_5
-if %scelta%==6 goto utility_6
-if %scelta%==7 goto utility_7
-if %scelta%==8 goto utility_8
-if %scelta%==9 goto utility_9
-if %scelta%==10 goto utility_10
-if %scelta%==11 goto utility_11
-if %scelta%==12 goto utility_12
-if %scelta%==13 goto utility_13
-if %scelta%==14 goto utility_14
-if %scelta%==15 goto utility_15
-if %scelta%==16 goto utility_16
-if %scelta%==17 goto utility_17
-if %scelta%==18 goto utility_18
-if %scelta%==19 goto utility_19
-if %scelta%==20 goto utility_20
+if %scelta% geq 1 if %scelta% leq 20 goto utility_%scelta%
 
 goto menu
 ::#endregion
@@ -238,10 +204,8 @@ set /p scelta="Inserisci il numero del file da avviare (exit per uscire): "
 if "%scelta%"=="exit" goto menu
 
 if "%scelta%"=="modmenu" explorer "!modmenu!"
-if "%scelta%"=="modmenudebug" explorer "!modmenudebug!"
 
 if "%scelta%"=="modmenu" goto mod
-if "%scelta%"=="modmenudebug" goto mod
 
 if defined file%scelta% (
     call "!file%scelta%!"
@@ -367,7 +331,6 @@ echo.
 %P_BLUE%         '' '' *::  :cclllllllllllllll%P_END% & echo.
 %P_BLUE%                        ''''''''''*::cll%P_END% & echo.
 %P_BLUE%                                  ''''%P_END% & echo.
-3
 
 pause >nul
 goto menu
