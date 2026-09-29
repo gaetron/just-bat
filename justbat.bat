@@ -1591,7 +1591,7 @@ for /f "usebackq delims=" %%L in ("%TXTFILE%") do (
         echo --- [!COUNT!] Scarico: !URL!
         echo.
         
-        "%YTDLP_CMD%" !FFMPEG_PARAM! -f "bestvideo[height<=480]+bestaudio/best[height<=480]" ^
+        "%YTDLP_CMD%" !FFMPEG_PARAM! -f best ^
             -o "%DEST_DIR%%%(title)s.%%(ext)s" ^
             --merge-output-format mp4 ^
             "!URL!"
