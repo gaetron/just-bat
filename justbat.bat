@@ -635,18 +635,19 @@ set "target_dir=%target_dir:"=%"
 if not exist "%target_dir%" (echo [!] Percorso non valido. & pause & goto utility_9)
 
 for %%I in ("%target_dir%") do set "folder_name=%%~nxI"
-set "output_file=%~dp0%folder_name%.txt"
+if not defined folder_name set "folder_name=root"
+set "output_file=%USERPROFILE%\Downloads\%folder_name%.txt"
 
 set "ps_logger=%temp%\file_logger.ps1"
 if exist "%ps_logger%" del "%ps_logger%"
 
 echo $target = "%target_dir%" > "%ps_logger%"
 echo $outFile = "%output_file%" >> "%ps_logger%"
-echo "" > $outFile >> "%ps_logger%"
+echo Set-Content -Path $outFile -Value $null >> "%ps_logger%"
 echo. >> "%ps_logger%"
 echo function Get-Tree($path, $level) { >> "%ps_logger%"
 echo     $indent = "    " * $level >> "%ps_logger%"
-echo     $items = Get-ChildItem -Path $path -ErrorAction SilentlyContinue >> "%ps_logger%"
+echo     $items = Get-ChildItem -LiteralPath $path -ErrorAction SilentlyContinue >> "%ps_logger%"
 echo. >> "%ps_logger%"
 echo     # Scrittura Cartelle >> "%ps_logger%"
 echo     foreach ($item in $items ^| Where-Object { $_.PSIsContainer }) { >> "%ps_logger%"
@@ -662,7 +663,6 @@ echo     } >> "%ps_logger%"
 echo } >> "%ps_logger%"
 echo. >> "%ps_logger%"
 echo Add-Content $outFile "LOG DIRECTORY: $target" >> "%ps_logger%"
-:: Separatore con simboli di uguale come richiesto
 echo Add-Content $outFile "================================================================================================" >> "%ps_logger%"
 echo Get-Tree $target 0 >> "%ps_logger%"
 
@@ -674,7 +674,7 @@ if exist "%output_file%" (
     echo.
     echo =================================================================
     echo LOG COMPLETATO!
-    echo Salvato come: %folder_name%.txt
+    echo Salvato in: %output_file%
     echo =================================================================
     echo.
 )
